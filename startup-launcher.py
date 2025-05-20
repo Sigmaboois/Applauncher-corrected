@@ -7,7 +7,7 @@ import subprocess
 import sys
 import threading
 import pystray
-from PIL import Image, ImageDraw
+from PIL import Image
 
 CONFIG_FILE = "startup_apps.json"
 REGISTRY_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -112,29 +112,25 @@ class StartupAppManager:
             except Exception as e:
                 print(f"Failed to launch {app}: {e}")
 
-    from PIL import Image
+    def show_tray_icon(self):
+        try:
+            image = Image.open("icon.ico")
+        except Exception as e:
+            print(f"Failed to load tray icon: {e}")
+            return
 
-def show_tray_icon(self):
-    image = Image.open("icon.ico")
-    menu = pystray.Menu(pystray.MenuItem("Exit", self.exit_tray))
-    self.tray_icon = pystray.Icon("StartupApp", image, "Startup App Auto-Run", menu)
+        menu = pystray.Menu(pystray.MenuItem("Exit", self.exit_tray))
+        self.tray_icon = pystray.Icon("StartupApp", image, "Startup App Auto-Run", menu)
 
-    def run_icon():
-        self.tray_icon.run()
+        def run_icon():
+            self.tray_icon.run()
 
-    threading.Thread(target=run_icon, daemon=True).start()
-
+        threading.Thread(target=run_icon, daemon=True).start()
 
     def exit_tray(self, icon=None, item=None):
         if self.tray_icon:
             self.tray_icon.stop()
         sys.exit()
-
-    def create_icon(self):
-        image = Image.new("RGB", (64, 64), "black")
-        draw = ImageDraw.Draw(image)
-        draw.rectangle((16, 16, 48, 48), fill="white")
-        return image
 
     def save_and_register(self):
         self.save_config()
