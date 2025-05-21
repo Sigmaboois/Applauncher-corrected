@@ -9,7 +9,15 @@ import threading
 import pystray
 from PIL import Image
 
-CONFIG_FILE = "startup_apps.json"
+def get_config_path():
+    if getattr(sys, 'frozen', False):  # Running as PyInstaller EXE
+        base_path = os.path.dirname(sys.executable)
+    else:
+        base_path = os.path.dirname(__file__)
+    return os.path.join(base_path, "startup_apps.json")
+
+CONFIG_FILE = get_config_path()
+
 REGISTRY_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
 REGISTRY_PREFIX = "MyStartupApp_"
 
